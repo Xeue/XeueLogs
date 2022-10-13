@@ -151,21 +151,22 @@ export function log(message, level, lineNumInp) {
         let draw = false;
         let colour;
         let catagory;
-    
+        let showLineNum = debugLineNum;
+
         switch (level) {
             case "A":
             case "I":
                 if (loggingLevel == "A") { //White
                     draw = true;
                     colour = w;
-                    catagory = " INFO";
+                    catagory = "  INFO";
                 }
                 break;
             case "D":
                 if (loggingLevel == "A" || loggingLevel == "D") { //Cyan
                     draw = true;
                     colour = c;
-                    catagory = "DEBUG";
+                    catagory = " DEBUG";
                 }
                 break;
             case "S":
@@ -173,32 +174,32 @@ export function log(message, level, lineNumInp) {
                 if (loggingLevel == "A" || loggingLevel == "D") { //Blue
                     draw = true;
                     colour = b;
-                    catagory = "NETWK";
+                    catagory = "NETWRK";
                 }
                 break;
             case "W":
                 if (loggingLevel != "E") { //Yellow
                     draw = true;
                     colour = y;
-                    catagory = " WARN";
+                    catagory = "  WARN";
                 }
                 break;
             case "E": //Red
                 colour = r;
-                catagory = "ERROR";
+                catagory = " ERROR";
                 draw = true;
                 break;
             case "H": //Green
                 colour = g;
-                catagory = " HELP";
+                catagory = "  HELP";
                 draw = true;
-                debugLineNum == false
+                showLineNum = false;
                 break;
             case "C":
             default: //Green
                 draw = true;
                 colour = g;
-                catagory = " CORE";
+                catagory = "  CORE";
         }
     
         let lineNumString = ` ${p}${lineNum}${reset}`;
@@ -209,7 +210,7 @@ export function log(message, level, lineNumInp) {
                 }
             }
         }
-        if (debugLineNum == false || debugLineNum == "false") {
+        if (showLineNum == false || showLineNum == "false") {
             lineNumString = ``;
         }
         if (custom) {
