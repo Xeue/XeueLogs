@@ -1,0 +1,23 @@
+{
+  "name": "nodelogs",
+  "version": "1.0.0",
+  "description": "Small package for advanced logging, see gitHub repo for more",
+  "main": "logs.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xeue/NodeLogs.git"
+  },
+  "keywords": [
+    "logs"
+  ],
+  "author": "Sam Chilton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Xeue/NodeLogs/issues"
+  },
+  "homepage": "https://github.com/Xeue/NodeLogs#readme"
+}
