@@ -1,7 +1,7 @@
 {
-  "name": "nodelogs",
-  "version": "1.0.0",
-  "description": "Small package for advanced logging, see gitHub repo for more",
+  "name": "xeue-logs",
+  "version": "1.0.2",
+  "description": "Small package for advanced logging, see gitHub repo for more, thanks to patorjk for the ASCI/Figlet generator",
   "main": "logs.js",
   "type": "module",
   "scripts": {
@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/Xeue/NodeLogs/issues"
   },
-  "homepage": "https://github.com/Xeue/NodeLogs#readme"
+  "homepage": "https://github.com/Xeue/NodeLogs#readme",
+  "dependencies": {
+    "figlet": "^1.5.2"
+  }
 }

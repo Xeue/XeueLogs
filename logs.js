@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import figlet from 'figlet';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,13 +49,15 @@ export const logs = {
     debugLineNum: debugLineNum
 }
 
-function printHeader(asci) {
+function printHeader(text) {
     console.clear();
-    for (let index = 0; index < asci.length; index++) {
-        const line = asci[index];
-        console.log(line);
-        logFile(line, true);
-    }
+    const asci = figlet.textSync(text, {
+        font: 'Big',
+        horizontalLayout: 'fitted',
+        verticalLayout: 'fitted'
+    })
+    console.log(asci);
+    logFile(asci, true);
 }
 
 function setConf(conf) {
@@ -91,7 +94,7 @@ export function log(message, level, lineNumInp) {
     const e = new Error();
     const stack = e.stack.toString().split(/\r\n|\n/);
     const folder = __dirname.substring(__dirname.lastIndexOf("\\")+1);
-    let lineNum = '('+stack[2].substring(stack[2].indexOf(folder)+folder.length+1);
+    let lineNum = '('+stack[2].split('/').pop();
     if (typeof lineNumInp !== "undefined") {
         lineNum = lineNumInp;
     }
