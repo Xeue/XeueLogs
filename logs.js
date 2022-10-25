@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import figlet from 'figlet';
+import EventEmitter from 'events';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,7 @@ export let logsFileName = "Test";
 export let configLocation = __dirname;
 export let loggingLevel = "A";
 export let debugLineNum = true;
+export const logEvent = new EventEmitter();
 
 
 export const logs = {
@@ -254,6 +256,7 @@ export function logObj (message, obj, level) {
 export function logSend (message) {
     logFile(message);
     console.log(message);
+    logEvent.emit('logSend', message);
 }
 
 export function logFile (msg, sync = false) {
