@@ -95,7 +95,6 @@ export function log(message, level, lineNumInp) {
 
     const e = new Error();
     const stack = e.stack.toString().split(/\r\n|\n/);
-    const folder = __dirname.substring(__dirname.lastIndexOf("\\")+1);
     let lineNum = '('+stack[2].split('/').pop();
     if (typeof lineNumInp !== "undefined") {
         lineNum = lineNumInp;
@@ -238,8 +237,7 @@ export function log(message, level, lineNumInp) {
 export function logObj (message, obj, level) {
     const e = new Error();
     const stack = e.stack.toString().split(/\r\n|\n/);
-    const folder = __dirname.substring(__dirname.lastIndexOf("\\")+1);
-    let lineNum = '('+stack[2].substring(stack[2].indexOf(folder)+folder.length+1);
+    let lineNum = '('+stack[2].split('/').pop();
 
     let combined;
     if (typeof message === 'undefined') {
