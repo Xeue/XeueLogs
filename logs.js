@@ -151,7 +151,7 @@ export function log(message, level, lineNumInp) {
     
         let draw = false;
         let colour;
-        let catagory;
+        let catagory = '';
         let showLineNum = debugLineNum;
 
         switch (level) {
@@ -244,11 +244,11 @@ export function logObj (message, obj, level) {
         message = 'Logged object';
     }
     if (obj instanceof Error) {
-        combined = `${message}: ${obj.toString()}`;
+        log(obj.stack, level, lineNum);
     } else {
         combined = `${message}: ${JSON.stringify(obj, null, 4)}`;
+        log(combined, level, lineNum);
     }
-    log(combined, level, lineNum);
 }
 
 export function logSend (message) {
