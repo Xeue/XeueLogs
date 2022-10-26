@@ -214,11 +214,15 @@ export function log(message, level, lineNumInp) {
         if (showLineNum == false || showLineNum == "false") {
             lineNumString = ``;
         }
+        let seperator = ':';
         if (custom) {
             colour = customColor;
             catagory = customCatagory;
+            while (catagory.length < 6) {
+                catagory = ' ' + catagory
+            }
+            if (catagory == '' || catagory == '      ') seperator = '|'
         }
-        let seperator = ':';
         if (index !== 0) {
             lineNumString = ``;
             let newCatagory = '';
@@ -229,7 +233,7 @@ export function log(message, level, lineNumInp) {
             seperator = '|';
         }
         if (draw) {
-            logSend(`[${timeString}]${colour} ${catagory}${seperator} ${w}${message}${lineNumString}`);
+            logSend(`${reset}[${timeString}]${colour} ${catagory}${seperator} ${w}${message}${lineNumString}`);
         }
     }
 }
