@@ -21,12 +21,12 @@ export const logs = {
     setConf: setConf,
     loadArgs: loadArgs,
     log: log,
-    logObj: logObj,
-    logFile: logFile,
-    logSend: logSend,
+    object: logObj,
+    file: logFile,
     pause: pause,
     resume: resume,
     force: logForced,
+    input: input,
 
     r: "\x1b[31m", //red
     g: "\x1b[32m", //green
@@ -286,8 +286,8 @@ export function logFile (msg, sync = false) {
     }
 }
 
-function logSend(message) {
-    if (paused) return
+function logSend(message, force = false) {
+    if (paused && !force) return
     logFile(message);
     console.log(message);
     logEvent.emit('logSend', message);
@@ -295,11 +295,7 @@ function logSend(message) {
 
 function logForced(message, level, lineNumInp) {
     const output = log(message, level, lineNumInp)
-    if (paused) {
-        logFile(output);
-        console.log(output);
-        logEvent.emit('logSend', output);
-    }
+    logSend(output, true)
 }
 
 function pause() {
@@ -310,4 +306,44 @@ function pause() {
 function resume() {
     paused = false
     logEvent.emit('logResume')
+}
+
+function parseInput(input, backup) {
+    try {
+        input = JSON.parse(input)
+    } catch (error) {
+        input = input
+    }
+    if ((input === '' || typeof input === 'undefined') && typeof backup !== 'undefined') {
+        input = backup
+    }
+    return input
+}
+    
+function input(placeholder, seperatorColour = logs.c, textColour = logs.c) {
+    const userInput = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        prompt: `${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}: ${textColour}`
+    })
+    const promise = new Promise ((resolve)=>{
+        if (typeof placeholder !== 'undefined') {
+            console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}: ${logs.reset}${logs.dim}${placeholder}${logs.reset}${textColour}`)
+            readline.moveCursor(process.stdout, 0, -1)
+            readline.moveCursor(process.stdout, 23, 0)
+        } else {
+            console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}: ${textColour}`)
+            readline.moveCursor(process.stdout, 0, -1)
+            readline.moveCursor(process.stdout, 23, 0)
+        }
+        userInput.on('line', async (input)=>{
+            userInput.close();
+            const output = parseInput(input, placeholder)
+            readline.moveCursor(process.stdout, 0, -1)
+            readline.clearLine(process.stdout, 1)
+            logSend(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}| ${textColour}${output}${logs.reset}`, true)
+            resolve(output)
+        })
+    })
+    return [promise, userInput]
 }
