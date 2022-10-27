@@ -295,9 +295,11 @@ function logSend(message) {
 
 function logForced(message, level, lineNumInp) {
     const output = log(message, level, lineNumInp)
-    logFile(output);
-    console.log(output);
-    logEvent.emit('logSend', output);
+    if (paused) {
+        logFile(output);
+        console.log(output);
+        logEvent.emit('logSend', output);
+    }
 }
 
 function pause() {
