@@ -28,6 +28,10 @@ export const logs = {
 	resume: resume,
 	force: logForced,
 	input: input,
+	silentInput: silentInput,
+	error: error,
+	warn: warn,
+	debug: debug,
 
 	r: '\x1b[31m', //red
 	g: '\x1b[32m', //green
@@ -213,11 +217,16 @@ export function log(message, level, lineNumInp) {
 	}
 }
 
-export function logObj (message, obj, level) {
-	const e = new Error()
-	const stack = e.stack.toString().split(/\r\n|\n/)
-	let lineNum = '('+stack[2].split('/').pop()
-
+export function logObj (message, obj, level, lineNumInp) {
+	let lineNum
+	if (typeof lineNumInp !== 'undefined') {
+		lineNum = lineNumInp
+	} else {
+		const e = new Error()
+		const stack = e.stack.toString().split(/\r\n|\n/)
+		lineNum = '('+stack[2].split('/').pop()
+	}
+    
 	let combined
 	if (typeof message === 'undefined') {
 		message = 'Logged object'
@@ -275,7 +284,53 @@ function logSend(message, force = false) {
 
 function logForced(message, level, lineNumInp) {
 	const output = log(message, level, lineNumInp)
+	if (!paused) return
 	logSend(output, true)
+}
+
+function error(message, object) {
+	const e = new Error()
+	const stack = e.stack.toString().split(/\r\n|\n/)
+	let lineNum = '('+stack[2].split('/').pop()
+	logSwitch(message, object, 'E', lineNum)
+}
+function debug(message, object) {
+	const e = new Error()
+	const stack = e.stack.toString().split(/\r\n|\n/)
+	let lineNum = '('+stack[2].split('/').pop()
+	logSwitch(message, object, 'D', lineNum)
+}
+function warn(message, object) {
+	const e = new Error()
+	const stack = e.stack.toString().split(/\r\n|\n/)
+	let lineNum = '('+stack[2].split('/').pop()
+	logSwitch(message, object, 'W', lineNum)
+}
+
+function logSwitch(message, object, level, lineNum) {
+	let text
+	switch (level) {
+	case 'E':
+		text = 'Error'
+		break
+	case 'W':
+		text = 'Warning'
+		break
+	case 'D':
+		text = 'Debug'
+		break
+	default:
+		break
+	}
+	if (typeof message !== 'undefined' && typeof object !== 'undefined') {
+		logObj(message, object, level, lineNum)
+	} else if (typeof message !== 'undefined' && typeof object === 'undefined') {
+		log(message, level, lineNum)
+	} else if (typeof message === 'undefined' && typeof object !== 'undefined') {
+		logObj(text, object, level, lineNum)
+	} else {
+		log(`It looks like an unspecified: ${text} has been called`, level, lineNum)
+	}
 }
 
 function pause() {
@@ -323,6 +378,23 @@ function input(placeholder, seperatorColour = logs.c, textColour = logs.c) {
 			readline.moveCursor(process.stdout, 0, -1)
 			readline.clearLine(process.stdout, 1)
 			logSend(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}| ${textColour}${output}${logs.reset}`, true)
+			resolve(output)
+		})
+	})
+	return [promise, userInput]
+}
+
+function silentInput() {
+	const userInput = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	})
+	const promise = new Promise ((resolve)=>{
+		userInput.on('line', async (input)=>{
+			userInput.close()
+			const output = parseInput(input)
+			readline.moveCursor(process.stdout, 0, -1)
+			readline.clearLine(process.stdout, 1)
 			resolve(output)
 		})
 	})
