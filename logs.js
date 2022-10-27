@@ -7,22 +7,13 @@ import EventEmitter from 'events';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const r = "\x1b[31m"; //red
-export const g = "\x1b[32m"; //green
-export const y = "\x1b[33m"; //yellow
-export const b = "\x1b[34m"; //blue
-export const p = "\x1b[35m"; //pruple
-export const c = "\x1b[36m"; //cyan
-export const w = "\x1b[37m"; //white
-export const reset = "\x1b[0m";
-export const dim = "\x1b[2m";
-export const bright = "\x1b[1m";
 export let createLogFile = true;
 export let logsFileName = "Test";
 export let configLocation = __dirname;
 export let loggingLevel = "A";
 export let debugLineNum = true;
 export const logEvent = new EventEmitter();
+let paused = false;
 
 
 export const logs = {
@@ -33,17 +24,20 @@ export const logs = {
     logObj: logObj,
     logFile: logFile,
     logSend: logSend,
+    pause: pause,
+    resume: resume,
+    force: logForced,
 
-    r: r,
-    g: g,
-    y: y,
-    b: b,
-    p: p,
-    c: c,
-    w: w,
-    reset: reset,
-    dim: dim,
-    bright: bright,
+    r: "\x1b[31m", //red
+    g: "\x1b[32m", //green
+    y: "\x1b[33m", //yellow
+    b: "\x1b[34m", //blue
+    p: "\x1b[35m", //pruple
+    c: "\x1b[36m", //cyan
+    w: "\x1b[37m", //white
+    reset: "\x1b[0m",
+    dim: "\x1b[2m",
+    bright: "\x1b[1m",
     createLogFile: createLogFile,
     logsFileName: logsFileName,
     configLocation: configLocation,
@@ -74,8 +68,8 @@ function loadArgs() {
     if (typeof args[0] !== "undefined") {
         if (args[0] == "--help" || args[0] == "-h" || args[0] == "-H" || args[0] == "--h" || args[0] == "--H") {
             log(`You can start the server with two arguments: (config path) (logging level)`, "H");
-            log(`The first argument is the relative path of the config file, eg (${y}.${reset}) or (${y}/Config1${reset})`, "H");
-            log(`The second argument is the desired logging level ${w+dim}(A)ll${reset}, ${c}(D)ebug${reset}, ${y}(W)arnings${reset}, ${r}(E)rrors${reset}`, "H");
+            log(`The first argument is the relative path of the config file, eg (${logs.y}.${logs.reset}) or (${logs.y}/Config1${logs.reset})`, "H");
+            log(`The second argument is the desired logging level ${w+dim}(A)ll${logs.reset}, ${logs.c}(D)ebug${logs.reset}, ${logs.y}(W)arnings${logs.reset}, ${logs.r}(E)rrors${logs.reset}`, "H");
             process.exit(1);
         }
         if (args[0] == ".") {
@@ -111,24 +105,24 @@ export function log(message, level, lineNumInp) {
     const timeString = `${hours}:${minutes}:${seconds}.${millis}`;
 
     if (typeof message === "undefined") {
-        log(`Log message from line ${p}${lineNum}${reset} is not defined`, "E");
+        log(`Log message from line ${logs.p}${lineNum}${logs.reset} is not defined`, "E");
         return;
     } else if (typeof message !== "string") {
-        log(`Log message from line ${p}${lineNum}${reset} is not a string so attemping to stringify`, "A");
+        log(`Log message from line ${logs.p}${lineNum}${logs.reset} is not a string so attemping to stringify`, "A");
         try {
             message = JSON.stringify(message, null, 4);
         } catch (e) {
-            log(`Log message from line ${p}${lineNum}${reset} could not be converted to string`, "E");
+            log(`Log message from line ${logs.p}${lineNum}${logs.reset} could not be converted to string`, "E");
         }
     }
 
-    message = message.replace(/true/g, g + "true" + w);
-    message = message.replace(/false/g, r + "false" + w);
-    message = message.replace(/null/g, y + "null" + w);
-    message = message.replace(/undefined/g, y + "undefined" + w);
+    message = message.replace(/true/g, `${logs.g}true${logs.w}`);
+    message = message.replace(/false/g, `${logs.r}false${logs.w}`);
+    message = message.replace(/null/g, `${logs.y}null${logs.w}`);
+    message = message.replace(/undefined/g, `${logs.y}undefined${logs.w}`);
     message = message.replace(/[\r]/g, "");
     let messageArray = message.split(/[\r\n]/g);
-    let customColor = p;
+    let customColor = logs.p;
     let customCatagory;
     let custom = false;
     if (Array.isArray(level)) {
@@ -146,7 +140,7 @@ export function log(message, level, lineNumInp) {
         const regexp = / \((.*?):(.[0-9]*):(.[0-9]*)\)"/g;
         const matches = message.matchAll(regexp);
         for (const match of matches) {
-            message = message.replace(match[0], `" [${y}${match[1]}${reset}] ${p}(${match[2]}:${match[3]})${reset}`);
+            message = message.replace(match[0], `" [${logs.y}${match[1]}${logs.reset}] ${logs.p}(${match[2]}:${match[3]})${logs.reset}`);
         }
     
         let draw = false;
@@ -159,14 +153,14 @@ export function log(message, level, lineNumInp) {
             case "I":
                 if (loggingLevel == "A") { //White
                     draw = true;
-                    colour = w;
+                    colour = logs.w;
                     catagory = "  INFO";
                 }
                 break;
             case "D":
                 if (loggingLevel == "A" || loggingLevel == "D") { //Cyan
                     draw = true;
-                    colour = c;
+                    colour = logs.c;
                     catagory = " DEBUG";
                 }
                 break;
@@ -174,24 +168,24 @@ export function log(message, level, lineNumInp) {
             case "N":
                 if (loggingLevel == "A" || loggingLevel == "D") { //Blue
                     draw = true;
-                    colour = b;
+                    colour = logs.b;
                     catagory = "NETWRK";
                 }
                 break;
             case "W":
                 if (loggingLevel != "E") { //Yellow
                     draw = true;
-                    colour = y;
+                    colour = logs.y;
                     catagory = "  WARN";
                 }
                 break;
             case "E": //Red
-                colour = r;
+                colour = logs.r;
                 catagory = " ERROR";
                 draw = true;
                 break;
             case "H": //Green
-                colour = g;
+                colour = logs.g;
                 catagory = "  HELP";
                 draw = true;
                 showLineNum = false;
@@ -199,11 +193,11 @@ export function log(message, level, lineNumInp) {
             case "C":
             default: //Green
                 draw = true;
-                colour = g;
+                colour = logs.g;
                 catagory = "  CORE";
         }
     
-        let lineNumString = ` ${p}${lineNum}${reset}`;
+        let lineNumString = ` ${logs.p}${lineNum}${logs.reset}`;
         if (Array.isArray(level)) {
             if (level.length > 3) {
                 if (!level[3]) {
@@ -233,7 +227,8 @@ export function log(message, level, lineNumInp) {
             seperator = '|';
         }
         if (draw) {
-            logSend(`${reset}[${timeString}]${colour} ${catagory}${seperator} ${w}${message}${lineNumString}`);
+            logSend(`${logs.reset}[${timeString}]${colour} ${catagory}${seperator} ${logs.w}${message}${lineNumString}`);
+            return `${logs.reset}[${timeString}]${colour} ${catagory}${seperator} ${logs.w}${message}${lineNumString}`
         }
     }
 }
@@ -255,12 +250,6 @@ export function logObj (message, obj, level) {
     }
 }
 
-export function logSend (message) {
-    logFile(message);
-    console.log(message);
-    logEvent.emit('logSend', message);
-}
-
 export function logFile (msg, sync = false) {
     if (createLogFile) {
         const dir = `${configLocation}/logs`;
@@ -277,7 +266,7 @@ export function logFile (msg, sync = false) {
         const yyyy = today.getFullYear();
 
         const fileName = `${dir}/${logsFileName}-[${yyyy}-${mm}-${dd}].log`;
-        const data = msg.replaceAll(r, "").replaceAll(g, "").replaceAll(y, "").replaceAll(b, "").replaceAll(p, "").replaceAll(c, "").replaceAll(w, "").replaceAll(reset, "").replaceAll(dim, "").replaceAll(bright, "") + "\n";
+        const data = msg.replaceAll(logs.r, "").replaceAll(logs.g, "").replaceAll(logs.y, "").replaceAll(logs.b, "").replaceAll(logs.p, "").replaceAll(logs.c, "").replaceAll(logs.w, "").replaceAll(logs.reset, "").replaceAll(logs.dim, "").replaceAll(logs.bright, "") + "\n";
 
         if (sync) {
             try {
@@ -295,4 +284,28 @@ export function logFile (msg, sync = false) {
             });
         }
     }
+}
+
+function logSend(message) {
+    if (paused) return
+    logFile(message);
+    console.log(message);
+    logEvent.emit('logSend', message);
+}
+
+function logForced(message, level, lineNumInp) {
+    const output = log(message, level, lineNumInp)
+    logFile(output);
+    console.log(output);
+    logEvent.emit('logSend', output);
+}
+
+function pause() {
+    logEvent.emit('logPause')
+    paused = true
+}
+
+function resume() {
+    paused = false
+    logEvent.emit('logResume')
 }
