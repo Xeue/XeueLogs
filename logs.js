@@ -16,9 +16,10 @@ export let loggingLevel = 'A'
 export let debugLineNum = true
 export const logEvent = new EventEmitter()
 let paused = false
+let doneHeader = false
 
 
-export const logs = {
+export let logs = {
 	printHeader: printHeader,
 	setConf: setConf,
 	log: log,
@@ -32,6 +33,9 @@ export const logs = {
 	error: error,
 	warn: warn,
 	debug: debug,
+	use: (logger) => {
+		logs = logger
+	},
 
 	r: '\x1b[31m', //red
 	g: '\x1b[32m', //green
@@ -51,7 +55,7 @@ export const logs = {
 }
 
 function printHeader(text) {
-	console.clear()
+	if (doneHeader) return
 	const asci = figlet.textSync(text, {
 		font: 'Big',
 		horizontalLayout: 'fitted',
@@ -59,6 +63,7 @@ function printHeader(text) {
 	})
 	console.log(asci)
 	logFile(asci, true)
+	doneHeader = true
 }
 
 function setConf(conf) {
