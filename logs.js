@@ -97,12 +97,12 @@ export function log(message, level, lineNumInp) {
 		log(`Log message from line ${logs.p}${lineNum}${logs.reset} is not defined`, 'E')
 		return
 	} else if (typeof message !== 'string') {
-		log(`Log message from line ${logs.p}${lineNum}${logs.reset} is not a string so attemping to stringify`, 'A')
+		log(`Log message from line ${logs.p}${lineNum}${logs.reset} is not a string so attemping to stringify`, 'E')
 		try {
 			message = JSON.stringify(message, null, 4)
 		} catch (e) {
 			log(`Log message from line ${logs.p}${lineNum}${logs.reset} could not be converted to string`, 'E')
-			logs.object(e, 'E')
+			logs.object('Message', e, 'E')
 			console.dir(message)
 			return
 		}
@@ -125,7 +125,7 @@ export function log(message, level, lineNumInp) {
 		level = level[0]
 		custom = true
 	}
-
+	let returnArray = []
 	for (let index = 0; index < messageArray.length; index++) {
 		let message = messageArray[index]
         
@@ -220,9 +220,10 @@ export function log(message, level, lineNumInp) {
 		}
 		if (draw) {
 			logSend(`${logs.reset}[${timeString}]${colour} ${catagory}${seperator} ${logs.w}${message}${lineNumString}`)
-			return `${logs.reset}[${timeString}]${colour} ${catagory}${seperator} ${logs.w}${message}${lineNumString}`
+			returnArray.push(`${logs.reset}[${timeString}]${colour} ${catagory}${seperator} ${logs.w}${message}${lineNumString}`)
 		}
 	}
+	return returnArray.join('\n')
 }
 
 export function logObj (message, obj, level, lineNumInp) {
