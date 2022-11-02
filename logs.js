@@ -102,6 +102,9 @@ export function log(message, level, lineNumInp) {
 			message = JSON.stringify(message, null, 4)
 		} catch (e) {
 			log(`Log message from line ${logs.p}${lineNum}${logs.reset} could not be converted to string`, 'E')
+			logs.object(e, 'E')
+			console.dir(message)
+			return
 		}
 	}
 
@@ -239,7 +242,12 @@ export function logObj (message, obj, level, lineNumInp) {
 	if (obj instanceof Error) {
 		log(obj.stack, level, lineNum)
 	} else {
-		combined = `${message}: ${JSON.stringify(obj, null, 4)}`
+		try {
+			combined = `${message}: ${JSON.stringify(obj, null, 4)}`
+		} catch (error) {
+			log(message, level, lineNum)
+			combined = obj
+		}
 		log(combined, level, lineNum)
 	}
 }
