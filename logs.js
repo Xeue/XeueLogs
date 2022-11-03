@@ -30,6 +30,7 @@ export let logs = {
 	force: logForced,
 	input: input,
 	silentInput: silentInput,
+	select: select,
 	error: error,
 	warn: warn,
 	debug: debug,
@@ -44,9 +45,30 @@ export let logs = {
 	p: '\x1b[35m', //pruple
 	c: '\x1b[36m', //cyan
 	w: '\x1b[37m', //white
+	black: '\x1b[30m', //black
 	reset: '\x1b[0m',
 	dim: '\x1b[2m',
 	bright: '\x1b[1m',
+	underline: '\x1b[4m',
+
+	FgBlack: "\x1b[30m",
+	FgRed: "\x1b[31m",
+	FgGreen: "\x1b[32m",
+	FgYellow: "\x1b[33m",
+	FgBlue: "\x1b[34m",
+	FgMagenta: "\x1b[35m",
+	FgCyan: "\x1b[36m",
+	FgWhite: "\x1b[37m",
+
+	BgBlack: "\x1b[40m",
+	BgRed: "\x1b[41m",
+	BgGreen: "\x1b[42m",
+	BgYellow: "\x1b[43m",
+	BgBlue: "\x1b[44m",
+	BgMagenta: "\x1b[45m",
+	BgCyan: "\x1b[46m",
+	BgWhite: "\x1b[47m",
+
 	createLogFile: createLogFile,
 	logsFileName: logsFileName,
 	configLocation: configLocation,
@@ -369,7 +391,77 @@ function parseInput(input, backup) {
 	}
 	return output
 }
-    
+
+function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
+
+	function printSelected(moveCursor = true) {
+		let options = []
+		list.forEach((option, index) => {
+			switch (option) {
+			case true:
+				option = `${logs.g}${option}`
+				break
+			case false:
+				option = `${logs.r}${option}`
+				break
+			case undefined:
+			case null:
+				option = `${logs.y}${option}`
+				break
+			}
+			if (index == selected) {
+				options.push(`${logs.reset}${logs.underline}${option}${logs.reset}${logs.dim}`)
+			} else {
+				options.push(`${logs.dim}${option}`)
+			}
+		})
+		if (moveCursor) readline.moveCursor(process.stdout, 0, -1)
+		console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}: ${logs.reset}${options.join(',')}`)
+	}
+
+	let selected = list.indexOf(current)
+	printSelected(false)
+
+	const promise = new Promise((resolve) => {
+		const stdin = process.stdin
+		stdin.setRawMode(true)
+		stdin.resume()
+		stdin.setEncoding('utf8')
+		
+		stdin.on('keypress', function(letter, key){
+			switch (key.name) {
+			case 'right': //Right
+				if (selected < list.length - 1) {
+					selected++
+					printSelected()
+				}
+				break
+			case 'left': //Left
+				if (selected > 0) {
+					selected--
+					printSelected()
+				}
+				break
+			case 'c': //Stop code
+				if (key.ctrl) process.exit()
+				break
+			case 'return': //Enter
+				stdin.removeAllListeners('keypress')
+				readline.moveCursor(process.stdout, 0, -1)
+				readline.clearLine(process.stdout, 1)
+				console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}| ${textColour}${list[selected]}${logs.reset}`)
+				resolve(list[selected])
+				break
+			default:
+				log(key.name)
+				break
+			}
+		})
+	})
+
+	return promise
+}
+
 function input(placeholder, seperatorColour = logs.c, textColour = logs.c) {
 	const userInput = readline.createInterface({
 		input: process.stdin,
