@@ -250,6 +250,7 @@ export function log(message, level, lineNumInp) {
 
 export function logObj (message, obj, level, lineNumInp) {
 	let lineNum
+	let errorMessage = true
 	if (typeof lineNumInp !== 'undefined') {
 		lineNum = lineNumInp
 	} else {
@@ -257,12 +258,24 @@ export function logObj (message, obj, level, lineNumInp) {
 		const stack = e.stack.toString().split(/\r\n|\n/)
 		lineNum = '('+stack[2].split('/').pop()
 	}
+
+	if (typeof message === 'object') {
+		if (typeof obj === 'string') {
+			level = obj
+		}
+		obj = message
+		message = undefined
+		errorMessage = false
+	}
     
 	let combined
 	if (typeof message === 'undefined') {
 		message = 'Logged object'
 	}
 	if (obj instanceof Error) {
+		if (errorMessage) {
+			log(message, level, lineNum)
+		}
 		log(obj.stack, level, lineNum)
 	} else {
 		try {
@@ -493,7 +506,8 @@ function input(placeholder, seperatorColour = logs.c, textColour = logs.c) {
 function silentInput() {
 	const userInput = readline.createInterface({
 		input: process.stdin,
-		output: process.stdout
+		output: process.stdout,
+		prompt: ''
 	})
 	const promise = new Promise ((resolve)=>{
 		userInput.on('line', async (input)=>{
