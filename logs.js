@@ -262,8 +262,7 @@ function logObj(message, obj, level, lineNumInp) {
 		message = undefined;
 		errorMessage = false;
 	}
-	
-    
+
 	let combined;
 	if (typeof message === 'undefined') {
 		message = 'Logged object';
