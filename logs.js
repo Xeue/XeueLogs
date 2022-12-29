@@ -262,7 +262,7 @@ function logObj(message, obj, level, lineNumInp) {
 		message = undefined;
 		errorMessage = false;
 	}
-
+    
 	let combined;
 	if (typeof message === 'undefined') {
 		message = 'Logged object';
@@ -401,20 +401,22 @@ function parseInput(input, backup) {
 }
 
 function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
+	let hasDescription = false;
+	let listPretty = {};
 
 	function printSelected(moveCursor = true) {
 		let options = [];
 		list.forEach((option, index) => {
 			switch (option) {
 			case true:
-				option = `${logs.g}${option}`;
+				option = hasDescription ? `${logs.g}${listPretty[option]}` : `${logs.g}${option}`;
 				break;
 			case false:
-				option = `${logs.r}${option}`;
+				option = hasDescription ? `${logs.r}${listPretty[option]}` : `${logs.r}${option}`;
 				break;
 			case undefined:
 			case null:
-				option = `${logs.y}${option}`;
+				option = hasDescription ? `${logs.y}${listPretty[option]}` : `${logs.y}${option}`;
 				break;
 			}
 			if (index == selected) {
@@ -425,6 +427,11 @@ function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
 		});
 		if (moveCursor) readline.moveCursor(process.stdout, 0, -1);
 		console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}: ${logs.reset}${options.join(',')}`);
+	}
+
+	if (!Array.isArray(list)) {
+		hasDescription = true;
+		[list, listPretty] = [Object.keys(list), list];
 	}
 
 	let selected = list.indexOf(current);
