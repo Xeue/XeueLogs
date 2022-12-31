@@ -407,22 +407,24 @@ function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
 	function printSelected(moveCursor = true) {
 		let options = [];
 		list.forEach((option, index) => {
+			let colour = '';
 			switch (option) {
 			case true:
-				option = hasDescription ? `${logs.g}${listPretty[option]}` : `${logs.g}${option}`;
+				colour = logs.g;
 				break;
 			case false:
-				option = hasDescription ? `${logs.r}${listPretty[option]}` : `${logs.r}${option}`;
+				colour = logs.r;
 				break;
 			case undefined:
 			case null:
-				option = hasDescription ? `${logs.y}${listPretty[option]}` : `${logs.y}${option}`;
+				colour = logs.y;
 				break;
 			}
+			const text = hasDescription ? listPretty[option] : option;
 			if (index == selected) {
-				options.push(`${logs.reset}${logs.underline}${option}${logs.reset}${logs.dim}`);
+				options.push(`${logs.reset}${logs.underline}${colour}${text}${logs.reset}${logs.dim}`);
 			} else {
-				options.push(`${logs.dim}${option}`);
+				options.push(`${logs.dim}${colour}${text}`);
 			}
 		});
 		if (moveCursor) readline.moveCursor(process.stdout, 0, -1);
@@ -464,7 +466,8 @@ function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
 				stdin.removeAllListeners('keypress');
 				readline.moveCursor(process.stdout, 0, -1);
 				readline.clearLine(process.stdout, 1);
-				console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}| ${textColour}${list[selected]}${logs.reset}`);
+				const text = hasDescription ? listPretty[list[selected]] : list[selected];
+				console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}| ${textColour}${text}${logs.reset}`);
 				resolve(list[selected]);
 				break;
 			default:
