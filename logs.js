@@ -473,7 +473,9 @@ function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
 				readline.clearLine(process.stdout, 1);
 				const text = hasDescription ? listPretty[list[selected]] : list[selected];
 				console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}| ${textColour}${text}${logs.reset}`);
-				resolve(list[selected]);
+				let ret = list[selected] === 'true' ? true : list[selected];
+				ret = list[selected] === 'false' ? false : ret;
+				resolve(ret);
 				break;
 			default:
 				log(key.name);
