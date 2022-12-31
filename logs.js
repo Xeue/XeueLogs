@@ -403,6 +403,11 @@ function parseInput(input, backup) {
 function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
 	let hasDescription = false;
 	let listPretty = {};
+	
+	if (!Array.isArray(list)) {
+		hasDescription = true;
+		[list, listPretty] = [Object.keys(list), list];
+	}
 
 	function printSelected(moveCursor = true) {
 		let options = [];
@@ -410,9 +415,11 @@ function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
 			let colour = '';
 			switch (option) {
 			case true:
+			case 'true':
 				colour = logs.g;
 				break;
 			case false:
+			case 'false':
 				colour = logs.r;
 				break;
 			case undefined:
@@ -431,12 +438,10 @@ function select(list, current, seperatorColour = logs.c, textColour = logs.c) {
 		console.log(`${logs.reset}[ ${logs.c}User Input${logs.w} ]       ${seperatorColour}: ${logs.reset}${options.join(',')}`);
 	}
 
-	if (!Array.isArray(list)) {
-		hasDescription = true;
-		[list, listPretty] = [Object.keys(list), list];
-	}
-
 	let selected = list.indexOf(current);
+	if (selected == -1) {
+		selected = list.indexOf(String(current));
+	}
 	printSelected(false);
 
 	const promise = new Promise((resolve) => {
