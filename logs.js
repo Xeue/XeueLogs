@@ -92,16 +92,7 @@ function setConf(conf) {
 }
 
 function log(message, level, lineNumInp) {
-
-	const e = new Error();
-	const stack = e.stack.toString().split(/\r\n|\n/);
-	let lineNum = '('+stack[2].split('\\').pop();
-	if (typeof lineNumInp !== 'undefined') {
-		lineNum = lineNumInp;
-	}
-	if (lineNum[lineNum.length - 1] !== ')') {
-		lineNum += ')';
-	}
+	const lineNum = typeof lineNumInp !== 'undefined' ? lineNumInp : getLineNumber();
 	const timeNow = new Date();
 	const hours = String(timeNow.getHours()).padStart(2, '0');
 	const minutes = String(timeNow.getMinutes()).padStart(2, '0');
@@ -244,15 +235,8 @@ function log(message, level, lineNumInp) {
 }
 
 function logObj(message, obj, level, lineNumInp) {
-	let lineNum;
 	let errorMessage = true;
-	if (typeof lineNumInp !== 'undefined') {
-		lineNum = lineNumInp;
-	} else {
-		const e = new Error();
-		const stack = e.stack.toString().split(/\r\n|\n/);
-		lineNum = '('+stack[2].split('\\').pop();
-	}
+	const lineNum = typeof lineNumInp !== 'undefined' ? lineNumInp : getLineNumber();
 
 	if (typeof message === 'object') {
 		if (typeof obj === 'string') {
@@ -333,21 +317,15 @@ function logForced(message, level, lineNumInp) {
 }
 
 function error(message, object) {
-	const e = new Error();
-	const stack = e.stack.toString().split(/\r\n|\n/);
-	let lineNum = '('+stack[2].split('\\').pop();
+	const lineNum = getLineNumber();
 	logSwitch(message, object, 'E', lineNum);
 }
 function debug(message, object) {
-	const e = new Error();
-	const stack = e.stack.toString().split(/\r\n|\n/);
-	let lineNum = '('+stack[2].split('\\').pop();
+	const lineNum = getLineNumber();
 	logSwitch(message, object, 'D', lineNum);
 }
 function warn(message, object) {
-	const e = new Error();
-	const stack = e.stack.toString().split(/\r\n|\n/);
-	let lineNum = '('+stack[2].split('\\').pop();
+	const lineNum = getLineNumber();
 	logSwitch(message, object, 'W', lineNum);
 }
 
@@ -531,6 +509,16 @@ function silentInput() {
 		});
 	});
 	return [promise, userInput];
+}
+
+function getLineNumber() {
+	const error = new Error();
+	const stack = error.stack.toString().split(/\r\n|\n/);
+	let lineNum = '('+stack[3].split('\\').pop().split('/').pop();
+	if (lineNum[lineNum.length - 1] !== ')') {
+		lineNum += ')';
+	}
+	return lineNum;
 }
 
 exports.logs = logs;

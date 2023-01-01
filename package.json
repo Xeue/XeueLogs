@@ -1,6 +1,6 @@
 {
   "name": "xeue-logs",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "description": "Small package for advanced logging, see gitHub repo for more, thanks to patorjk for the ASCI/Figlet generator",
   "main": "logs.js",
   "scripts": {
@@ -21,8 +21,5 @@
   "homepage": "https://github.com/Xeue/NodeLogs#readme",
   "dependencies": {
     "figlet": "^1.5.2"
-  },
-  "devDependencies": {
-    "eslint": "^8.26.0"
   }
 }
