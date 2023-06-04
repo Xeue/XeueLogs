@@ -306,6 +306,7 @@ function logFile(msg, sync = false) {
 function logSend(message, force = false) {
 	if (paused && !force) return;
 	logFile(message);
+	readline.moveCursor(process.stdout, -5000, 0);
 	console.log(message);
 	logEvent.emit('logSend', message);
 }
