@@ -287,6 +287,7 @@ class Logs extends EventEmitter {
 	logSend(message, force = false) {
 		if (this.paused && !force) return;
 		this.file(message);
+		readline.moveCursor(process.stdout, -5000, 0);
 		console.log(message);
 		this.emit('logSend', message);
 	}
