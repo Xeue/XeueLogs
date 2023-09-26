@@ -50,6 +50,7 @@ class Logs extends EventEmitter {
 		this.BgMagenta = '\x1b[45m';
 		this.BgCyan = '\x1b[46m';
 		this.BgWhite = '\x1b[47m';
+		readline.emitKeypressEvents(process.stdin);
 	}
 
 	printHeader(text) {
@@ -379,7 +380,12 @@ class Logs extends EventEmitter {
 			[list, listPretty] = [Object.keys(list), list];
 		}
 	
-		function printSelected(moveCursor = true) {
+		let selected = list.indexOf(current);
+		if (selected == -1) {
+			selected = list.indexOf(String(current));
+		}
+
+		const printSelected = (moveCursor = true) => {
 			let options = [];
 			list.forEach((option, index) => {
 				let colour = '';
@@ -407,20 +413,12 @@ class Logs extends EventEmitter {
 			if (moveCursor) readline.moveCursor(process.stdout, 0, -1);
 			console.log(`${this.reset}[ ${this.c}User Input${this.w} ]       ${seperatorColour}: ${this.reset}${options.join(',')}`);
 		}
-	
-		let selected = list.indexOf(current);
-		if (selected == -1) {
-			selected = list.indexOf(String(current));
-		}
+
 		printSelected(false);
-	
-		const promise = new Promise((resolve) => {
-			const stdin = process.stdin;
-			stdin.setRawMode(true);
-			stdin.resume();
-			stdin.setEncoding('utf8');
-			
-			stdin.on('keypress', function(letter, key){
+		return new Promise(resolve => {
+			process.stdin.setRawMode(true);
+			process.stdin.resume();
+			process.stdin.on('keypress', (ch, key) => {
 				switch (key.name) {
 				case 'right': //Right
 					if (selected < list.length - 1) {
@@ -435,26 +433,30 @@ class Logs extends EventEmitter {
 					}
 					break;
 				case 'c': //Stop code
-					if (key.ctrl) process.exit();
+					if (key.ctrl) {
+						this.force('Process exited by user command', ['H','SERVER',this.r]);
+						process.exit();
+					}
 					break;
 				case 'return': //Enter
-					stdin.removeAllListeners('keypress');
+					process.stdin.removeAllListeners('keypress');
+					process.stdin.setRawMode(false);
 					readline.moveCursor(process.stdout, 0, -1);
 					readline.clearLine(process.stdout, 1);
 					const text = hasDescription ? listPretty[list[selected]] : list[selected];
-					console.log(`${this.reset}[ ${this.c}User Input${this.w} ]       ${seperatorColour}| ${textColour}${text}${this.reset}`);
+					console.log(`${this.reset}[${this.c}Data Entered${this.w}]       ${seperatorColour}| ${textColour}${text}${this.reset}`);
 					let ret = list[selected] === 'true' ? true : list[selected];
 					ret = list[selected] === 'false' ? false : ret;
 					resolve(ret);
 					break;
 				default:
-					this.log(key.name);
 					break;
 				}
 			});
+			this.on('cancelInput', () => {
+				resolve(false);
+			});
 		});
-	
-		return promise;
 	}
 
 	input(placeholder, seperatorColour = this.c, textColour = this.c) {
@@ -475,10 +477,10 @@ class Logs extends EventEmitter {
 			}
 			userInput.on('line', async (input)=>{
 				userInput.close();
-				const output = parseInput(input, placeholder);
+				const output = this.parseInput(input, placeholder);
 				readline.moveCursor(process.stdout, 0, -1);
 				readline.clearLine(process.stdout, 1);
-				this.logSend(`${this.reset}[ ${this.c}User Input${this.w} ]       ${seperatorColour}| ${textColour}${output}${this.reset}`, true);
+				this.logSend(`${this.reset}[${this.c}Data Entered${this.w}]       ${seperatorColour}| ${textColour}${output}${this.reset}`, true);
 				resolve(output);
 			});
 		});
@@ -494,7 +496,7 @@ class Logs extends EventEmitter {
 		const promise = new Promise ((resolve)=>{
 			userInput.on('line', async (input)=>{
 				userInput.close();
-				const output = parseInput(input);
+				const output = this.parseInput(input);
 				readline.moveCursor(process.stdout, 0, -1);
 				readline.clearLine(process.stdout, 1);
 				resolve(output);
