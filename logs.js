@@ -97,7 +97,9 @@ class Logs extends EventEmitter {
 				return;
 			}
 		}
-	
+		message = message + ',';
+		message = message.replace(/=(.*?)([ |,|)|}|\]])/g, `=${this.y}$1${this.w}$2`);
+		message = message.slice(0, -1);
 		message = message.replace(/true/g, `${this.g}true${this.w}`);
 		message = message.replace(/false/g, `${this.r}false${this.w}`);
 		message = message.replace(/null/g, `${this.y}null${this.w}`);
