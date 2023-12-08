@@ -86,7 +86,7 @@ class Logs extends EventEmitter {
 		if (typeof message === 'undefined') {
 			this.log(`Log message from line ${this.p}${lineNum}${this.reset} is not defined`, 'E');
 			return;
-		} else if (typeof message !== 'string') {
+		} else if (typeof message !== 'string' && typeof message !== 'boolean' && typeof message !== 'number') {
 			this.log(`Log message from line ${this.p}${lineNum}${this.reset} is not a string so attemping to stringify`, 'E');
 			try {
 				message = JSON.stringify(message, null, 4);
