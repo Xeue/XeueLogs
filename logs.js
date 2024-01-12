@@ -7,18 +7,18 @@ const readline = require('readline');
 class Logs extends EventEmitter {
 	constructor(
 		createLogFile = true,
-        logsFileName = 'logs',
-        configLocation = __dirname,
-        loggingLevel = 'D',
+		logsFileName = 'logs',
+		configLocation = './',
+		loggingLevel = 'D',
 		debugLineNum = false,
 		paused = false,
 		doneHeader = false
 	) {
 		super();
 		this.createLogFile = createLogFile;
-        this.logsFileName = logsFileName;
-        this.configLocation = configLocation;
-        this.loggingLevel = loggingLevel;
+		this.logsFileName = logsFileName;
+		this.configLocation = configLocation;
+		this.loggingLevel = loggingLevel;
 		this.debugLineNum = debugLineNum;
 		this.paused = paused;
 		this.doneHeader = doneHeader;
