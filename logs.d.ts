@@ -16,19 +16,41 @@ export class Logs extends EventEmitter {
     ): void;
 
 	setConf(
-        conf: Object
+        conf: {
+            'createLogFile': boolean,
+            'logsFileName': string,
+            'configLocation': string,
+            'loggingLevel': string,
+            'debugLineNum': boolean
+        }
     ): void;
 
 	log(
         message: any,
-        level: string | Array<string>,
+        level: string | [
+            Level,
+            Catagory,
+            Colour
+        ],
         lineNumInp: string
-    ): string;
+    ): {
+        'timeString': string,
+        'colour': string,
+        'textColour': string,
+        'catagory': string,
+        'seperator': string,
+        'message': string,
+        'lineNumString': string
+    };
 
 	object(
         message: string,
         obj: Object,
-        level: string | Array<string>,
+        level: string | [
+            Level,
+            Catagory,
+            Colour
+        ],
         lineNumInp: string
     ): void;
 
@@ -38,13 +60,25 @@ export class Logs extends EventEmitter {
     ): void;
 
 	logSend(
-        message: string,
+        msgObj: {
+            'timeString': string,
+            'colour': string,
+            'textColour': string,
+            'catagory': string,
+            'seperator': string,
+            'message': string,
+            'lineNumString': string
+        },
         force: boolean
     ): void;
 
 	force(
         message: string,
-        level: string | Array<string>,
+        level: string | [
+            Level,
+            Catagory,
+            Colour
+        ],
         lineNumInp: string
     ): void;
 
@@ -71,7 +105,11 @@ export class Logs extends EventEmitter {
 	logSwitch(
         message: string,
         object: Object,
-        level: string | Array<string>,
+        level: string | [
+            Level,
+            Catagory,
+            Colour
+        ],
         lineNum: string
     ): void;
 

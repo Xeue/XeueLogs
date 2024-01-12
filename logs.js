@@ -181,7 +181,7 @@ class Logs extends EventEmitter {
 				catagory = '  CORE';
 			}
 		
-			let lineNumString = ` ${this.p}${lineNum}${this.reset}`;
+			let lineNumString = `${lineNum}`;
 			if (Array.isArray(level)) {
 				if (level.length > 3) {
 					if (!level[3]) {
@@ -211,11 +211,27 @@ class Logs extends EventEmitter {
 				seperator = '|';
 			}
 			if (draw) {
-				this.logSend(`${this.reset}[${timeString}]${colour} ${catagory}${seperator} ${this.w}${message}${lineNumString}`);
-				returnArray.push(`${this.reset}[${timeString}]${colour} ${catagory}${seperator} ${this.w}${message}${lineNumString}`);
+				this.logSend({
+					'timeString': timeString,
+					'colour': colour,
+					'catagory': catagory,
+					'textColour': this.w,
+					'seperator': seperator,
+					'message': message,
+					'lineNumString': lineNumString
+				});
+				returnArray.push({
+					'timeString': timeString,
+					'colour': colour,
+					'catagory': catagory,
+					'textColour': this.w,
+					'seperator': seperator,
+					'message': message,
+					'lineNumString': lineNumString
+				});
 			}
 		}
-		return returnArray.join('\n');
+		return returnArray;
 	}
 
 	object(message, obj, level, lineNumInp) {
@@ -287,18 +303,18 @@ class Logs extends EventEmitter {
 		}
 	}
 
-	logSend(message, force = false) {
+	logSend(msgObj, force = false) {
 		if (this.paused && !force) return;
-		this.file(message);
+		this.file(`${this.reset}[${msgObj.timeString}]${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
 		readline.moveCursor(process.stdout, -5000, 0);
-		console.log(message);
-		this.emit('logSend', message);
+		console.log(`${this.reset}[${msgObj.timeString}]${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
+		this.emit('logSend', msgObj);
 	}
 
 	force(message, level, lineNumInp) {
-		const output = this.log(message, level, lineNumInp);
+		const messages = this.log(message, level, lineNumInp);
 		if (!this.paused) return;
-		this.logSend(output, true);
+		messages.forEach(msg => this.logSend(msg, null, true));
 	}
 
 	info(message, object) {
@@ -482,7 +498,15 @@ class Logs extends EventEmitter {
 				const output = this.parseInput(input, placeholder);
 				readline.moveCursor(process.stdout, 0, -1);
 				readline.clearLine(process.stdout, 1);
-				this.logSend(`${this.reset}[${this.c}Data Entered${this.w}]       ${seperatorColour}| ${textColour}${output}${this.reset}`, true);
+				this.logSend({
+					'timeString': 'Data Entered',
+					'colour': seperatorColour,
+					'textColour': textColour,
+					'catagory': '',
+					'seperator': seperator,
+					'message': output,
+					'lineNumString': ''
+				}, true);
 				resolve(output);
 			});
 		});
