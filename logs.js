@@ -499,11 +499,11 @@ class Logs extends EventEmitter {
 				readline.moveCursor(process.stdout, 0, -1);
 				readline.clearLine(process.stdout, 1);
 				this.logSend({
-					'timeString': 'Data Entered',
+					'timeString': `${this.c}Data Entered${this.reset}`,
 					'colour': seperatorColour,
 					'textColour': textColour,
 					'catagory': '',
-					'seperator': seperator,
+					'seperator': '      |',
 					'message': output,
 					'lineNumString': ''
 				}, true);
