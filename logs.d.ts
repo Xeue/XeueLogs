@@ -36,6 +36,8 @@ export class Logs extends EventEmitter {
     ): {
         'timeString': string,
         'colour': string,
+        'level': string,
+        'levelColour': string,
         'textColour': string,
         'catagory': string,
         'seperator': string,

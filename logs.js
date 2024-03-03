@@ -214,6 +214,7 @@ class Logs extends EventEmitter {
 				this.logSend({
 					'timeString': timeString,
 					'colour': colour,
+					'level': level,
 					'catagory': catagory,
 					'textColour': this.w,
 					'seperator': seperator,
@@ -223,6 +224,7 @@ class Logs extends EventEmitter {
 				returnArray.push({
 					'timeString': timeString,
 					'colour': colour,
+					'level': level,
 					'catagory': catagory,
 					'textColour': this.w,
 					'seperator': seperator,
@@ -305,9 +307,38 @@ class Logs extends EventEmitter {
 
 	logSend(msgObj, force = false) {
 		if (this.paused && !force) return;
-		this.file(`${this.reset}[${msgObj.timeString}]${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
+		let level = '[•]'+this.reset;
+		let levelColour = this.g;
+		switch (msgObj.level) {
+		case 'A':
+		case 'I':
+			level = '[I]'+this.reset;
+			levelColour = this.dim;
+			break;
+		case 'S':
+		case 'N':
+		case 'D':
+			level = '[D]'+this.reset;
+			levelColour = this.c;
+			break;
+		case 'W':
+			level = '[W]'+this.reset;
+			levelColour = this.y;
+			break;
+		case 'E': //Red
+			level = '[E]'+this.reset;
+			levelColour = this.r;
+			break;
+		case 'H': //Green
+			level = '[H]'+this.reset;
+			levelColour = this.g;
+			break;
+		}
+		msgObj.levelColour = levelColour;
+		msgObj.level = level;
+		this.file(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
 		readline.moveCursor(process.stdout, -5000, 0);
-		console.log(`${this.reset}[${msgObj.timeString}]${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
+		console.log(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
 		this.emit('logSend', msgObj);
 	}
 
@@ -430,7 +461,7 @@ class Logs extends EventEmitter {
 			});
 			if (moveCursor) readline.moveCursor(process.stdout, 0, -1);
 			console.log(`${this.reset}[ ${this.c}User Input${this.w} ]       ${seperatorColour}: ${this.reset}${options.join(',')}`);
-		}
+		};
 
 		printSelected(false);
 		return new Promise(resolve => {
@@ -456,7 +487,7 @@ class Logs extends EventEmitter {
 						process.exit();
 					}
 					break;
-				case 'return': //Enter
+				case 'return': {//Enter
 					process.stdin.removeAllListeners('keypress');
 					process.stdin.setRawMode(false);
 					readline.moveCursor(process.stdout, 0, -1);
@@ -467,6 +498,7 @@ class Logs extends EventEmitter {
 					ret = list[selected] === 'false' ? false : ret;
 					resolve(ret);
 					break;
+				}
 				default:
 					break;
 				}
