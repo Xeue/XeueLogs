@@ -307,38 +307,38 @@ class Logs extends EventEmitter {
 
 	logSend(msgObj, force = false) {
 		if (this.paused && !force) return;
-		let level = '[•]'+this.reset;
+		let level = '[•]';
 		let levelColour = this.g;
 		switch (msgObj.level) {
 		case 'A':
 		case 'I':
-			level = '[I]'+this.reset;
+			level = '[I]';
 			levelColour = this.dim;
 			break;
 		case 'S':
 		case 'N':
 		case 'D':
-			level = '[D]'+this.reset;
+			level = '[D]';
 			levelColour = this.c;
 			break;
 		case 'W':
-			level = '[W]'+this.reset;
+			level = '[W]';
 			levelColour = this.y;
 			break;
 		case 'E': //Red
-			level = '[E]'+this.reset;
+			level = '[E]';
 			levelColour = this.r;
 			break;
 		case 'H': //Green
-			level = '[H]'+this.reset;
+			level = '[H]';
 			levelColour = this.g;
 			break;
 		}
 		msgObj.levelColour = levelColour;
 		msgObj.level = level;
-		this.file(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
+		this.file(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${this.reset}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
 		readline.moveCursor(process.stdout, -5000, 0);
-		console.log(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
+		console.log(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${this.reset}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
 		this.emit('logSend', msgObj);
 	}
 
