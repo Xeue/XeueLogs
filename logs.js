@@ -10,18 +10,22 @@ class Logs extends EventEmitter {
 		logsFileName = 'logs',
 		configLocation = './',
 		loggingLevel = 'D',
-		debugLineNum = false,
-		paused = false,
-		doneHeader = false
+		options = {
+			'debugLineNum': false,
+			'paused': false,
+			'doneHeader': false,
+			'template': '[$TIME][$LEVEL] $CATAGORY$SEPERATOR $MESSAGE $LINENUMBER'
+		}
 	) {
 		super();
 		this.createLogFile = createLogFile;
 		this.logsFileName = logsFileName;
 		this.configLocation = configLocation;
 		this.loggingLevel = loggingLevel;
-		this.debugLineNum = debugLineNum;
-		this.paused = paused;
-		this.doneHeader = doneHeader;
+		this.debugLineNum = options.debugLineNum;
+		this.paused = options.paused;
+		this.doneHeader = options.doneHeader;
+		this.template = options.template;
 		this.r = '\x1b[31m'; //red
 		this.g = '\x1b[32m'; //green
 		this.y = '\x1b[33m'; //yellow
@@ -321,6 +325,10 @@ class Logs extends EventEmitter {
 			level = '[D]';
 			levelColour = this.c;
 			break;
+		case 'U':
+			level = '[U]';
+			levelColour = this.c;
+			break;
 		case 'W':
 			level = '[W]';
 			levelColour = this.y;
@@ -336,9 +344,13 @@ class Logs extends EventEmitter {
 		}
 		msgObj.levelColour = levelColour;
 		msgObj.level = level;
-		this.file(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${this.reset}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
+
+		const output = this.#paternDecompose(msgObj.timeString, level, msgObj.catagory, msgObj.seperator, msgObj.message, msgObj.lineNumString, msgObj.colour, msgObj.textColour, levelColour)
+
+		this.file(output);
 		readline.moveCursor(process.stdout, -5000, 0);
-		console.log(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${this.reset}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
+		//console.log(`${this.reset}[${msgObj.timeString}]${levelColour}${level}${this.reset}${msgObj.colour} ${msgObj.catagory}${msgObj.seperator} ${msgObj.textColour}${msgObj.message} ${this.p}${msgObj.lineNumString}${this.reset}`);
+		console.log(output);
 		this.emit('logSend', msgObj);
 	}
 
@@ -460,7 +472,7 @@ class Logs extends EventEmitter {
 				}
 			});
 			if (moveCursor) readline.moveCursor(process.stdout, 0, -1);
-			console.log(`${this.reset}[ ${this.c}User Input${this.w} ]       ${seperatorColour}: ${this.reset}${options.join(',')}`);
+			console.log(this.#paternDecompose(' User Input ', 'U', '      ', ':', options.join(','), '', this.c, this.w, this.c));
 		};
 
 		printSelected(false);
@@ -493,7 +505,7 @@ class Logs extends EventEmitter {
 					readline.moveCursor(process.stdout, 0, -1);
 					readline.clearLine(process.stdout, 1);
 					const text = hasDescription ? listPretty[list[selected]] : list[selected];
-					console.log(`${this.reset}[${this.c}Data Entered${this.w}]       ${seperatorColour}| ${textColour}${text}${this.reset}`);
+					console.log(this.#paternDecompose('Data Entered', 'U', '      ', '|', text, '', this.c, textColour, this.c));
 					let ret = list[selected] === 'true' ? true : list[selected];
 					ret = list[selected] === 'false' ? false : ret;
 					resolve(ret);
@@ -513,17 +525,21 @@ class Logs extends EventEmitter {
 		const userInput = readline.createInterface({
 			input: process.stdin,
 			output: process.stdout,
-			prompt: `${this.reset}[ ${this.c}User Input${this.w} ]       ${seperatorColour}: ${textColour}`
+			prompt: this.#paternDecompose(' User Input ', 'U', '      ', ':', '', '', this.c, this.w, this.c)
 		});
 		const promise = new Promise ((resolve)=>{
 			if (typeof placeholder !== 'undefined') {
-				console.log(`${this.reset}[ ${this.c}User Input${this.w} ]       ${seperatorColour}: ${this.reset}${this.dim}${placeholder}${this.reset}${textColour}`);
+				const outputString = this.#paternDecompose(' User Input ', 'U', '      ', ':', placeholder, '', this.c, this.dim, this.c);
+				console.log(outputString);
+				const cusrsorPossition = outputString.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '').search(placeholder) || 1;
 				readline.moveCursor(process.stdout, 0, -1);
-				readline.moveCursor(process.stdout, 23, 0);
+				readline.moveCursor(process.stdout, cusrsorPossition, 0);
 			} else {
-				console.log(`${this.reset}[ ${this.c}User Input${this.w} ]       ${seperatorColour}: ${textColour}`);
+				const outputString = this.#paternDecompose(' User Input ', 'U', '      ', ':', '', '', this.c, this.dim, this.c);
+				console.log(outputString);
+				const cusrsorPossition = outputString.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '').search(':') || 1;
 				readline.moveCursor(process.stdout, 0, -1);
-				readline.moveCursor(process.stdout, 23, 0);
+				readline.moveCursor(process.stdout, cusrsorPossition, 0);
 			}
 			userInput.on('line', async (input)=>{
 				userInput.close();
@@ -532,6 +548,7 @@ class Logs extends EventEmitter {
 				readline.clearLine(process.stdout, 1);
 				this.logSend({
 					'timeString': `${this.c}Data Entered${this.reset}`,
+					'level': 'U',
 					'colour': seperatorColour,
 					'textColour': textColour,
 					'catagory': '',
@@ -571,6 +588,16 @@ class Logs extends EventEmitter {
 			lineNum += ')';
 		}
 		return lineNum;
+	}
+
+	#paternDecompose(time, level, catagory, seperator, message, lineNum, colour, textColour, levelColour) {
+		let output = this.reset + this.template.replace('$TIME', `${this.reset}${time}${this.reset}`);
+		output = output.replace('$LEVEL', `${levelColour}${level}${this.reset}`);
+		output = output.replace('$CATAGORY', `${colour}${catagory}${this.reset}`);
+		output = output.replace('$SEPERATOR', `${colour}${seperator}${this.reset}`);
+		output = output.replace('$MESSAGE', `${textColour}${message}${this.reset}`);
+		output = output.replace('$LINENUMBER', `${this.p}${lineNum}${this.reset}`);
+		return output;
 	}
 }
 
