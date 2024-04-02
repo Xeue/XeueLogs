@@ -22,10 +22,10 @@ class Logs extends EventEmitter {
 		this.logsFileName = logsFileName;
 		this.configLocation = configLocation;
 		this.loggingLevel = loggingLevel;
-		this.debugLineNum = options.debugLineNum;
-		this.paused = options.paused;
-		this.doneHeader = options.doneHeader;
-		this.template = options.template;
+		this.debugLineNum = options.debugLineNum || false;
+		this.paused = options.paused || false;
+		this.doneHeader = options.doneHeader || false;
+		this.template = options.template || '[$TIME][$LEVEL] $CATAGORY$SEPERATOR $MESSAGE $LINENUMBER';
 		this.r = '\x1b[31m'; //red
 		this.g = '\x1b[32m'; //green
 		this.y = '\x1b[33m'; //yellow
@@ -311,34 +311,34 @@ class Logs extends EventEmitter {
 
 	logSend(msgObj, force = false) {
 		if (this.paused && !force) return;
-		let level = '[•]';
+		let level = '•';
 		let levelColour = this.g;
 		switch (msgObj.level) {
 		case 'A':
 		case 'I':
-			level = '[I]';
+			level = 'I';
 			levelColour = this.dim;
 			break;
 		case 'S':
 		case 'N':
 		case 'D':
-			level = '[D]';
+			level = 'D';
 			levelColour = this.c;
 			break;
 		case 'U':
-			level = '[U]';
+			level = 'U';
 			levelColour = this.c;
 			break;
 		case 'W':
-			level = '[W]';
+			level = 'W';
 			levelColour = this.y;
 			break;
 		case 'E': //Red
-			level = '[E]';
+			level = 'E';
 			levelColour = this.r;
 			break;
 		case 'H': //Green
-			level = '[H]';
+			level = 'H';
 			levelColour = this.g;
 			break;
 		}
