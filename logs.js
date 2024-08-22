@@ -75,6 +75,7 @@ class Logs extends EventEmitter {
 		this.configLocation = conf?.configLocation;
 		this.loggingLevel = conf?.loggingLevel;
 		this.debugLineNum = conf?.debugLineNum;
+		console.log(this);
 	}
 
 	log(message, level, lineNumInp) {
@@ -357,7 +358,7 @@ class Logs extends EventEmitter {
 	force(message, level, lineNumInp) {
 		const messages = this.log(message, level, lineNumInp);
 		if (!this.paused) return;
-		messages.forEach(msg => this.logSend(msg, null, true));
+		messages.forEach(msg => this.logSend(msg, true));
 	}
 
 	info(message, object) {
