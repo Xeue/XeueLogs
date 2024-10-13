@@ -75,7 +75,6 @@ class Logs extends EventEmitter {
 		this.configLocation = conf?.configLocation;
 		this.loggingLevel = conf?.loggingLevel;
 		this.debugLineNum = conf?.debugLineNum;
-		console.log(this);
 	}
 
 	log(message, level, lineNumInp) {
@@ -506,7 +505,16 @@ class Logs extends EventEmitter {
 					readline.moveCursor(process.stdout, 0, -1);
 					readline.clearLine(process.stdout, 1);
 					const text = hasDescription ? listPretty[list[selected]] : list[selected];
-					console.log(this.#paternDecompose('Data Entered', 'U', '      ', '|', text, '', this.c, textColour, this.c));
+					this.logSend({
+						'timeString': `${this.c}Data Entered${this.reset}`,
+						'level': 'U',
+						'colour': seperatorColour,
+						'textColour': textColour,
+						'catagory': '',
+						'seperator': '      |',
+						'message': text,
+						'lineNumString': ''
+					}, true);
 					let ret = list[selected] === 'true' ? true : list[selected];
 					ret = list[selected] === 'false' ? false : ret;
 					resolve(ret);
