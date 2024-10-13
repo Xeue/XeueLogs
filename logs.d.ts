@@ -1,4 +1,5 @@
 declare module 'xeue-logs';
+import type EventEmitter from "events";
 
 export class Logs extends EventEmitter {
 	constructor(
@@ -7,9 +8,9 @@ export class Logs extends EventEmitter {
         configLocation: string,
         loggingLevel: string,
 		debugLineNum: boolean,
-		paused: boolean,
-		doneHeader: boolean
-	): void;
+		paused?: boolean,
+		doneHeader?: boolean
+	);
 
 	printHeader(
         text: string
@@ -27,12 +28,12 @@ export class Logs extends EventEmitter {
 
 	log(
         message: any,
-        level: string | [
-            Level,
-            Catagory,
-            Colour
+        level?: string | [
+            Level: string,
+            Catagory: string,
+            Colour: string
         ],
-        lineNumInp: string
+        lineNumInp?: string
     ): {
         'timeString': string,
         'colour': string,
@@ -48,12 +49,12 @@ export class Logs extends EventEmitter {
 	object(
         message: string,
         obj: Object,
-        level: string | [
-            Level,
-            Catagory,
-            Colour
+        level?: string | [
+            Level: string,
+            Catagory: string,
+            Colour: string
         ],
-        lineNumInp: string
+        lineNumInp?: string
     ): void;
 
 	file(
@@ -77,42 +78,42 @@ export class Logs extends EventEmitter {
 	force(
         message: string,
         level: string | [
-            Level,
-            Catagory,
-            Colour
+            Level: string,
+            Catagory: string,
+            Colour: string
         ],
-        lineNumInp: string
+        lineNumInp?: string
     ): void;
 
 	info(
         message: string,
-        object: Object
+        object?: Object
     ): void;
 
 	debug(
         message: string,
-        object: Object
+        object?: Object
     ): void;
 
 	warn(
         message: string,
-        object: Object
+        object?: Object
     ): void;
 
 	error(
         message: string,
-        object: Object
+        object?: Object
     ): void;
 
 	logSwitch(
         message: string,
         object: Object,
-        level: string | [
-            Level,
-            Catagory,
-            Colour
+        level?: string | [
+            Level: string,
+            Catagory: string,
+            Colour: string
         ],
-        lineNum: string
+        lineNum?: string
     ): void;
 
 	pause(): void;
@@ -125,7 +126,7 @@ export class Logs extends EventEmitter {
     ): Object;
 
 	select(
-        list: Array,
+        list: Array<any>,
         current: string,
         seperatorColour: string,
         textColour: string
@@ -139,9 +140,47 @@ export class Logs extends EventEmitter {
         placeholder: string,
         seperatorColour: string,
         textColour: string
-    ): Array<promise | string>
+    ): Array<Promise<any> | string>
 	
-	silentInput(): Array<promise | string>;
+	silentInput(): Array<Promise<any> | string>;
 
 	getLineNumber(): string;
+
+
+    createLogFile: boolean;
+    logsFileName: string;
+    configLocation: string;
+    loggingLevel: string;
+    debugLineNum: boolean;
+    paused: boolean;
+    doneHeader: boolean;
+    template: string;
+    r: string;
+    g: string;
+    y: string;
+    b: string;
+    p: string;
+    c: string;
+    w: string;
+    black: string;
+    reset: string;
+    dim: string;
+    bright: string;
+    underline: string;
+    FgBlack: string;
+    FgRed: string;
+    FgGreen: string;
+    FgYellow: string;
+    FgBlue: string;
+    FgMagenta: string;
+    FgCyan: string;
+    FgWhite: string;
+    BgBlack: string;
+    BgRed: string;
+    BgGreen: string;
+    BgYellow: string;
+    BgBlue: string;
+    BgMagenta: string;
+    BgCyan: string;
+    BgWhite: string;
 }
