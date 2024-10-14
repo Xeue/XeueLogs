@@ -592,7 +592,10 @@ class Logs extends EventEmitter {
 	getLineNumber() {
 		const error = new Error();
 		const stack = error.stack.toString().split(/\r\n|\n/);
-		let lineNum = '('+stack[3].split('\\').pop().split('/').pop();
+		const stackPos = stack.length > 3 ? 3 : stack.length - 1;
+		let lineNumRaw = stack[stackPos].split('\\').pop().split('/').pop();
+		if (lineNumRaw.includes('(')) lineNumRaw = lineNumRaw.split('(').pop();
+		let lineNum = '('+lineNumRaw;
 		if (lineNum[lineNum.length - 1] !== ')') {
 			lineNum += ')';
 		}
