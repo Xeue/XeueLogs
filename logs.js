@@ -524,7 +524,7 @@ class Logs extends EventEmitter {
 					break;
 				}
 			});
-			this.on('cancelInput', () => {
+			this.once('cancelInput', () => {
 				resolve(false);
 			});
 		});
