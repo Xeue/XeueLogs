@@ -1,10 +1,12 @@
 {
   "name": "xeue-logs",
-  "version": "2.3.6",
+  "version": "3.1.0",
   "description": "Small package for advanced logging, see gitHub repo for more, thanks to patorjk for the ASCI/Figlet generator",
-  "main": "logs.js",
+  "main": "dist/logs.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepack": "tsc",
+    "types:check": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -21,5 +23,10 @@
   "homepage": "https://github.com/Xeue/NodeLogs#readme",
   "dependencies": {
     "figlet": "^1.5.2"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.7.0",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
   }
 }
