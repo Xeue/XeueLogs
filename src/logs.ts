@@ -567,7 +567,7 @@ export class Logs extends EventEmitter {
                     'levelColour': seperatorColour,
                     'textColour': textColour,
                     'levelText': '',
-                    'seperator': '      |',
+                    'seperator': '|',
                     'text': output,
                     'lineNum': ''
                 }, true);

@@ -1,6 +1,6 @@
 {
   "name": "xeue-logs",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Small package for advanced logging, see gitHub repo for more, thanks to patorjk for the ASCI/Figlet generator",
   "main": "dist/logs.js",
   "scripts": {
