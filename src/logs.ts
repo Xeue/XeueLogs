@@ -515,7 +515,7 @@ export class Logs extends EventEmitter {
                             levelTextColour: seperatorColour,
                             textColour: textColour,
                             levelText: '',
-                            seperator: '      |',
+                            seperator: '|',
                             text: String(text),
                             lineNum: ''
                         }, true);
